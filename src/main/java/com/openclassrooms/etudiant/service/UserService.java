@@ -1,6 +1,7 @@
 package com.openclassrooms.etudiant.service;
 
 import com.openclassrooms.etudiant.entities.User;
+import com.openclassrooms.etudiant.dto.LoginResponseDTO;
 import com.openclassrooms.etudiant.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +33,7 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public String login(String login, String password) {
+    public LoginResponseDTO login(String login, String password) {
         Assert.notNull(login, "Login must not be null");
         Assert.notNull(password, "Password must not be null");
         Optional<User> user = userRepository.findByLogin(login);
@@ -41,7 +42,9 @@ public class UserService {
         User foundUser = user.get();
         if (!passwordEncoder.matches(password, foundUser.getPassword())) 
             throw new IllegalArgumentException("Invalid credentials");
-        return jwtService.generateToken(foundUser);
+        String token = jwtService.generateToken(foundUser);
+        String fullName = foundUser.getFirstName() + " " + foundUser.getLastName();
+        return new LoginResponseDTO(token, fullName);
     }
 
 
