@@ -1,7 +1,7 @@
 package com.openclassrooms.etudiant.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.openclassrooms.etudiant.dto.RegisterDTO;
+import com.openclassrooms.etudiant.dto.CreateUserRequestDTO;
 import com.openclassrooms.etudiant.entities.User;
 import com.openclassrooms.etudiant.repository.UserRepository;
 import com.openclassrooms.etudiant.service.UserService;
@@ -63,7 +63,7 @@ public class UserControllerTest {
     @Test
     public void registerUserWithoutRequiredData() throws Exception {
         // GIVEN
-        RegisterDTO registerDTO = new RegisterDTO();
+        CreateUserRequestDTO registerDTO = new CreateUserRequestDTO();
 
         // WHEN
         mockMvc.perform(MockMvcRequestBuilders.post(URL)
@@ -84,7 +84,7 @@ public class UserControllerTest {
         user.setPassword(PASSWORD);
         userService.register(user);
 
-        RegisterDTO registerDTO = new RegisterDTO();
+        CreateUserRequestDTO registerDTO = new CreateUserRequestDTO();
         registerDTO.setFirstName(FIRST_NAME);
         registerDTO.setLastName(LAST_NAME);
         registerDTO.setLogin(LOGIN);
@@ -102,7 +102,7 @@ public class UserControllerTest {
     @Test
     public void registerUserSuccessful() throws Exception {
         // GIVEN
-        RegisterDTO registerDTO = new RegisterDTO();
+        CreateUserRequestDTO registerDTO = new CreateUserRequestDTO();
         registerDTO.setFirstName(FIRST_NAME);
         registerDTO.setLastName(LAST_NAME);
         registerDTO.setLogin(LOGIN);

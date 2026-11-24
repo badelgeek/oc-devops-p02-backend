@@ -1,7 +1,11 @@
 package com.openclassrooms.etudiant.service;
 
 import com.openclassrooms.etudiant.entities.User;
+import com.openclassrooms.etudiant.mapper.UserDtoMapper;
+import com.openclassrooms.etudiant.dto.CreateUserRequestDTO;
 import com.openclassrooms.etudiant.dto.LoginResponseDTO;
+import com.openclassrooms.etudiant.dto.UserLightDTO;
+import com.openclassrooms.etudiant.dto.UserListResponseDTO;
 import com.openclassrooms.etudiant.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -20,6 +25,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final UserDtoMapper userDtoMapper;
 
     public void register(User user) {
         Assert.notNull(user, "User must not be null");
@@ -47,5 +53,24 @@ public class UserService {
         return new LoginResponseDTO(token, fullName);
     }
 
+    public UserListResponseDTO getUsers() {
+        List<UserLightDTO> users = userRepository.findAll().stream()
+        .map(userDtoMapper::toUserLightDTO)
+        .toList();
+        return new UserListResponseDTO(users);
+    }
 
+    public void addUser(CreateUserRequestDTO newUser) {
+        Assert.notNull(newUser, "User must not be null");
+        log.info("Creating new user");
+
+        Optional<User> optionalUser = userRepository.findByLogin(newUser.getLogin());
+        if (optionalUser.isPresent()) {
+            throw new IllegalArgumentException("User with login " + newUser.getLogin() + " already exists");
+        }
+        
+        User user = userDtoMapper.toEntity(newUser);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        userRepository.save(user);
+    }
 }

@@ -1,11 +1,13 @@
 package com.openclassrooms.etudiant.configuration.security;
 
 import jakarta.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -54,6 +56,8 @@ public class SpringSecurityConfig {
                         // Others protected routes will be added here.
                         .anyRequest().authenticated()
                 )
+                // Configuration spring security pour accepter et valider les JWT (via JwtDecoder)
+                .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
                 // .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(
                         (request, response, exception) -> {
