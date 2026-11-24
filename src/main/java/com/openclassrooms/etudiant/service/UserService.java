@@ -4,6 +4,7 @@ import com.openclassrooms.etudiant.entities.User;
 import com.openclassrooms.etudiant.mapper.UserDtoMapper;
 import com.openclassrooms.etudiant.dto.CreateUserRequestDTO;
 import com.openclassrooms.etudiant.dto.LoginResponseDTO;
+import com.openclassrooms.etudiant.dto.UserDetailDTO;
 import com.openclassrooms.etudiant.dto.UserLightDTO;
 import com.openclassrooms.etudiant.dto.UserListResponseDTO;
 import com.openclassrooms.etudiant.repository.UserRepository;
@@ -58,6 +59,10 @@ public class UserService {
         .map(userDtoMapper::toUserLightDTO)
         .toList();
         return new UserListResponseDTO(users);
+    }
+
+    public Optional<UserDetailDTO> getUserById(Long id) {
+        return userRepository.findById(id).map(userDtoMapper::toUserDetailDTO);
     }
 
     public void addUser(CreateUserRequestDTO newUser) {
