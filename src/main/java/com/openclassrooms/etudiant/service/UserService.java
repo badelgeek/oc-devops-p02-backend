@@ -4,6 +4,7 @@ import com.openclassrooms.etudiant.entities.User;
 import com.openclassrooms.etudiant.mapper.UserDtoMapper;
 import com.openclassrooms.etudiant.dto.CreateUserRequestDTO;
 import com.openclassrooms.etudiant.dto.LoginResponseDTO;
+import com.openclassrooms.etudiant.dto.UpdateUserRequestDTO;
 import com.openclassrooms.etudiant.dto.UserDetailDTO;
 import com.openclassrooms.etudiant.dto.UserLightDTO;
 import com.openclassrooms.etudiant.dto.UserListResponseDTO;
@@ -79,11 +80,46 @@ public class UserService {
         userRepository.save(user);
     }
 
+    public Optional<UserDetailDTO> updateUser(Long id, UpdateUserRequestDTO userInfos) {
+        Optional<User> optionalUser = userRepository.findById(id);
+        if(optionalUser.isEmpty()) {
+            return Optional.empty();
+        }
+
+        User user = optionalUser.get();
+        user.setFirstName(userInfos.getFirstName());
+        user.setLastName(userInfos.getLastName());
+
+        String newLogin = userInfos.getLogin();
+        if(!newLogin.equals(user.getLogin())) {
+            if(isUserLoginExists(newLogin)) {
+                throw new IllegalArgumentException("User login is already taken");
+            }
+            user.setLogin(newLogin);
+        }
+        
+        String newPassword = userInfos.getPassword();
+        if(newPassword != null && !newPassword.isEmpty()) {
+            user.setPassword(passwordEncoder.encode(newPassword));
+        }
+        userRepository.save(user);
+        return Optional.of(userDtoMapper.toUserDetailDTO(user));
+
+    }
+
     public boolean deleteUser(Long id) {
         if (!userRepository.existsById(id)) {
             return false;
         }
         userRepository.deleteById(id);
         return true;
+    }
+
+    private boolean isUserLoginExists(String login) {
+        Optional<User> optionalUser = userRepository.findByLogin(login);
+        if (optionalUser.isPresent()) {
+            return true;
+        }
+        return false;
     }
 }

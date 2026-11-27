@@ -2,6 +2,7 @@ package com.openclassrooms.etudiant.controller;
 
 import com.openclassrooms.etudiant.dto.LoginRequestDTO;
 import com.openclassrooms.etudiant.dto.LoginResponseDTO;
+import com.openclassrooms.etudiant.dto.UpdateUserRequestDTO;
 import com.openclassrooms.etudiant.dto.UserDetailDTO;
 import com.openclassrooms.etudiant.dto.UserListResponseDTO;
 import com.openclassrooms.etudiant.dto.CreateUserRequestDTO;
@@ -16,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -52,6 +54,15 @@ public class UserController {
     @GetMapping("/api/users/{id}")
     public ResponseEntity<UserDetailDTO> getUser(@PathVariable Long id) {
         Optional<UserDetailDTO> user = userService.getUserById(id);
+        if (user.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(user.get());
+    }
+
+    @PutMapping("/api/users/{id}")
+    public ResponseEntity<UserDetailDTO> updateUser(@PathVariable Long id, @Valid @RequestBody UpdateUserRequestDTO userInfos) {   
+        Optional<UserDetailDTO> user = userService.updateUser(id, userInfos);
         if (user.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
